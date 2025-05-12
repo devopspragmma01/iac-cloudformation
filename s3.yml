@@ -1,0 +1,16 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Bucket S3 para logs o archivos
+
+Parameters:
+  StackNamePrefix:
+    Type: String
+
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub '${StackNamePrefix}-${AWS::AccountId}-bucket'
+
+Outputs:
+  BucketName:
+    Value: !Ref S3Bucket

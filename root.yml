@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Root Stack - Despliegue modular de arquitectura básica Free Tier en AWS
+
+Parameters:
+  StackNamePrefix:
+    Type: String
+    Default: FreeTierLab
+    Description: Prefijo para nombrar los recursos
+
+Resources:
+  NetworkStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: network.yml
+      Parameters:
+        StackNamePrefix: !Ref StackNamePrefix
+
+  SecurityStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: security.yml
+      Parameters:
+        StackNamePrefix: !Ref StackNamePrefix
+        VpcId: !GetAtt NetworkStack.Outputs.VpcId
+
+  IAMStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: iam.yml
+      Parameters:
+        StackNamePrefix: !Ref StackNamePrefix
+
+  S3Stack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: s3.yml
+      Parameters:
+        StackNamePrefix: !Ref StackNamePrefix
+
+  EC2Stack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ec2.yml
+      Parameters:
+        StackNamePrefix: !Ref StackNamePrefix
+        VpcId: !GetAtt NetworkStack.Outputs.VpcId
+        SubnetId: !GetAtt NetworkStack.Outputs.PublicSubnet1
+        SecurityGroupId: !GetAtt SecurityStack.Outputs.EC2SecurityGroup
+        InstanceProfile: !GetAtt IAMStack.Outputs.InstanceProfile
+
+Outputs:
+  WebsitePublicIP:
+    Description: IP pública de la instancia EC2
+    Value: !GetAtt EC2Stack.Outputs.InstancePublicIP
