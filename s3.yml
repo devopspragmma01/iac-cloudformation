@@ -2,14 +2,16 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: Bucket S3 para logs o archivos
 
 Parameters:
-  StackNamePrefix:
+  nombreprefijobucket:
     Type: String
+    Description: "Este es prefijo parte del nombre que le pondremos al bucket a crear"
+    Default: "bucket"
 
 Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub '${StackNamePrefix}-${AWS::AccountId}-bucket'
+      BucketName: !Sub '${nombreprefijobucket}-${AWS::AccountId}-bucket'
 
 Outputs:
   BucketName:
